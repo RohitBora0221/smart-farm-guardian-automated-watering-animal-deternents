@@ -1,0 +1,38 @@
+// Pin definitions
+const int soilMoisturePin = A0;    // Analog pin connected to soil moisture sensor
+const int relayPin = 7;            // Digital pin connected to relay for water pump
+const int pirPin = 2;              // Digital pin connected to PIR sensor for animal detection
+const int deterrentPin = 3;        // Digital pin connected to deterrent (buzzer/LED)
+
+int soilMoistureThreshold = 400;   // Moisture threshold for watering (adjust based on your sensor)
+bool waterActive = false;
+bool deterrentActive = false;
+
+void setup() {
+  pinMode(relayPin, OUTPUT);
+  pinMode(deterrentPin, OUTPUT);
+  pinMode(pirPin, INPUT);
+  
+  Serial.begin(9600);             // Start serial monitor for debugging
+}
+
+void loop() {
+  // Check soil moisture level
+  int moistureValue = analogRead(soilMoisturePin);
+  Serial.print("Soil moisture level: ");
+  Serial.println(moistureValue);
+
+  // If soil is dry, turn on water pump
+  if (moistureValue < soilMoistureThreshold && !waterActive) {
+    Serial.println("Soil is dry. Starting irrigation...");
+    digitalWrite(relayPin, HIGH);  // Turn on water pump
+    waterActive = true;
+  } 
+  // If soil is moist, turn off water pump
+  else if (moistureValue >= soilMoistureThreshold && waterActive) {
+    Serial.println("Soil is sufficiently moist. Stopping irrigation...");
+    digitalWrite(relayPin, LOW);   // Turn off water pump
+    waterActive = false;
+  }
+
+  // Check for animal detection using
